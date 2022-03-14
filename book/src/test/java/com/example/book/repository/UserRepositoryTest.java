@@ -1,6 +1,5 @@
 package com.example.book.repository;
 
-import com.example.book.domain.BaseEntity;
 import com.example.book.domain.User;
 import com.example.book.domain.UserRole;
 import com.example.book.errors.UserNotFoundException;
@@ -23,14 +22,16 @@ class UserRepositoryTest {
 
     String email = "choo@naver.com";
     String password = "test";
+    String name = "name";
     UserRole role = UserRole.USER;
 
     @BeforeEach
     void setUp(){
         userRepository.save(User.builder()
-                .email(email)
-                .password(password)
-                .role(role).build());
+                        .name(name)
+                        .email(email)
+                        .password(password)
+                        .role(role).build());
     }
 
     @Test
@@ -43,15 +44,19 @@ class UserRepositoryTest {
     @Test
     void save(){
         String saveEmail = "choo";
+        String saveName = "name";
         User user = User.builder()
+                .name(saveName)
                 .email(saveEmail)
                 .password(password)
                 .role(role).build();
 
         final User savedUser = userRepository.save(user);
 
-        assertEquals(user.getEmail(), saveEmail);
-        assertEquals(user.getPassword(), password);
-        assertEquals(user.getRole(), role);
+
+        assertEquals(savedUser.getName(), saveName);
+        assertEquals(savedUser.getEmail(), saveEmail);
+        assertEquals(savedUser.getPassword(), password);
+        assertEquals(savedUser.getRole(), role);
     }
 }
