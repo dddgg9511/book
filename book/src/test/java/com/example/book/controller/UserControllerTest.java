@@ -37,7 +37,6 @@ class UserControllerTest {
     private static final String NAME = "테스트 이름";
     private static final String EMAIL = "test@email.com";
     private static final String PASSWORD = "1234abcd*";
-    private static final String PICTURE = "테스트 사진";
 
     @Autowired
     private UserRepository userRepository;

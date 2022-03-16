@@ -17,7 +17,6 @@ public class UserLoginData {
     private String password;
 
     @Builder
-
     public UserLoginData(String email, String password) {
         this.email = email;
         this.password = password;
