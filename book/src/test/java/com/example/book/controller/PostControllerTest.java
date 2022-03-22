@@ -7,6 +7,7 @@ import com.example.book.dto.SessionResponseData;
 import com.example.book.dto.UserLoginData;
 import com.example.book.dto.UserSaveRequestData;
 import com.example.book.repository.UserRepository;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,8 +33,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.hamcrest.Matchers.containsString;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -106,10 +106,41 @@ class PostControllerTest {
                         .andExpect(content().string(containsString(TITLE)));
             }
         }
+
+        @Nested
+        @DisplayName("등록된 게시물이 없다면")
+        class Context_not_exist_post{
+            private static final String EMPTY_LIST = "[]";
+
+            @BeforeEach
+            void setEmptyList() throws Exception{
+                List<Posts> postList = objectMapper.convertValue(
+                        getPostList(),
+                        new TypeReference<List<Posts>>() {
+                    });
+
+                postList.forEach(posts -> {
+                    try {
+                        deletePostBeforeTest(posts.getId());
+                    }
+                    catch (Exception e){
+                        e.printStackTrace();
+                    }
+                });
+            }
+
+            @Test
+            @DisplayName("빈 리스트를 리턴한다.")
+            void it_return_empty_list() throws Exception{
+                mockMvc.perform(get("/posts"))
+                        .andExpect(status().isOk())
+                        .andExpect(content().string(containsString(EMPTY_LIST)));
+            }
+        }
     }
 
     private User prepareUser(UserSaveRequestData saveRequestData) throws Exception {
-        ResultActions actions = mockMvc.perform(post("/users")
+        ResultActions actions = mockMvc.perform(post("/user")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(saveRequestData)));
 
@@ -166,5 +197,20 @@ class PostControllerTest {
         String content = mvcResult.getResponse().getContentAsString();
 
         return objectMapper.readValue(content, Posts.class);
+    }
+
+    private List<Posts> getPostList() throws Exception{
+        ResultActions actions = mockMvc.perform(get("/posts"));
+
+        MvcResult mvcResult = actions.andReturn();
+        String content = mvcResult.getResponse().getContentAsString();
+
+        return objectMapper.readValue(content, List.class);
+    }
+
+    private void deletePostBeforeTest(Long id) throws Exception {
+        mockMvc.perform(delete("/posts/" + id)
+                .header("Authorization",
+                        "Bearer " + sessionResponseData.getAccessToken()));
     }
 }

@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 
 @RestController
 @RequestMapping("/user")
@@ -21,7 +23,7 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public User createUser(UserSaveRequestData saveRequestData){
+    public User createUser(@Valid  UserSaveRequestData saveRequestData){
         return userService.signUp(saveRequestData);
     }
 }
