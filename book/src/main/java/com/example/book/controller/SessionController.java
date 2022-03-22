@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-@RequestMapping("/p")
+@RequestMapping("/session")
 @RestController
 @RequiredArgsConstructor
 public class SessionController {

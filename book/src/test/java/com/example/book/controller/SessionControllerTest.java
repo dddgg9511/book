@@ -83,7 +83,7 @@ class SessionControllerTest {
             void it_resposne_created_with_token() throws Exception{
                 mockMvc.perform(post("/session")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .contentType(objectMapper.writeValueAsString(userLoginData)))
+                            .content(objectMapper.writeValueAsString(userLoginData)))
                         .andDo(print())
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.accessToken", matchesPattern(TOKEN_REGEX)));
