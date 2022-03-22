@@ -34,6 +34,7 @@ public class AuthenticationFilter extends BasicAuthenticationFilter {
             );
             onSuccessfulAuthentication(request, response, authResult);
         }
+        chain.doFilter(request, response);
     }
 
     @Override

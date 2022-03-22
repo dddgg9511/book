@@ -1,13 +1,12 @@
 package com.example.book.controller;
 
 import com.example.book.domain.Posts;
+import com.example.book.dto.PostsSaveRequestData;
 import com.example.book.service.PostService;
+import javafx.geometry.Pos;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -15,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 public class PostController {
-    private PostService postService;
+    private final PostService postService;
 
     @GetMapping
     public List<Posts> list(){
@@ -24,6 +23,12 @@ public class PostController {
 
     @GetMapping("/{id}")
     public Posts detail(@PathVariable long id){
+        System.out.println(postService);
         return postService.getPost(id);
+    }
+
+    @PostMapping
+    public Posts create(@RequestBody PostsSaveRequestData requestData){
+        return postService.save(requestData);
     }
 }

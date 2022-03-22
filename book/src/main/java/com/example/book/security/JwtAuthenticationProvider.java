@@ -5,6 +5,7 @@ import com.example.book.service.AuthenticationService;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.stereotype.Component;
 
 public class JwtAuthenticationProvider implements AuthenticationProvider {
     private final AuthenticationService authenticationService;
