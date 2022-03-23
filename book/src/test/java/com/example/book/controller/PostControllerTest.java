@@ -6,6 +6,7 @@ import com.example.book.dto.PostsSaveRequestData;
 import com.example.book.dto.SessionResponseData;
 import com.example.book.dto.UserLoginData;
 import com.example.book.dto.UserSaveRequestData;
+import com.example.book.errors.InvalidParameterException;
 import com.example.book.errors.PostsNotFoundException;
 import com.example.book.repository.UserRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -27,15 +28,16 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
-//import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -183,6 +185,57 @@ class PostControllerTest {
                                 (result) -> assertTrue(
                                         result.getResolvedException().getClass().isAssignableFrom(PostsNotFoundException.class)));
 
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("게시물 등록 요청은")
+    class Describe_post {
+        private PostsSaveRequestData postsSaveRequestData;
+
+        @Nested
+        @DisplayName("게시물 정보가 주어진다면")
+        class Context_with_new_post {
+            @BeforeEach
+            public void setUp(){
+                postsSaveRequestData = getPostSaveData();
+            }
+
+            @Test
+            @DisplayName("게시물을 저장하고 상태코드 Created를 응답한다.")
+            void it_return_status_created() throws Exception{
+                mockMvc.perform(post("/posts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(postsSaveRequestData)))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.author",is(postsSaveRequestData.getAuthor())))
+                        .andExpect(jsonPath("$.content",is(postsSaveRequestData.getContent())))
+                        .andExpect(jsonPath("$.title",is(postsSaveRequestData.getTitle())));
+            }
+        }
+
+        @Nested
+        @DisplayName("잘못된 게시물 정보가 주어진다면")
+        class Context_with_worng_post{
+            @BeforeEach
+            public void setUp() {
+                postsSaveRequestData = PostsSaveRequestData.builder().build();
+            }
+
+            @Test
+            @DisplayName("상태코드 Bad Request를 응답한다.")
+            void it_return_status_bad_request() throws Exception{
+                mockMvc.perform(post("/posts")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(postsSaveRequestData)))
+                        .andDo(print())
+                        .andExpect(status().isBadRequest())
+                        .andExpect(
+                                (result) -> assertEquals(
+                                        InvalidParameterException.class.getCanonicalName(),
+                                        result.getResolvedException().getClass().getCanonicalName()
+                                ));
             }
         }
     }

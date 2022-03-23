@@ -2,14 +2,17 @@ package com.example.book.controller;
 
 import com.example.book.domain.Posts;
 import com.example.book.dto.PostsSaveRequestData;
+import com.example.book.errors.InvalidParameterException;
 import com.example.book.service.PostService;
 import javafx.geometry.Pos;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RequestMapping("/posts")
@@ -29,7 +32,10 @@ public class PostController {
     }
 
     @PostMapping
-    public Posts create(@RequestBody PostsSaveRequestData requestData){
+    public Posts create(@RequestBody @Valid PostsSaveRequestData requestData, BindingResult result){
+        if(result.hasErrors()){
+            throw new InvalidParameterException(result);
+        }
         return postService.save(requestData);
     }
 
