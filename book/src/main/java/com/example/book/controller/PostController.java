@@ -5,6 +5,8 @@ import com.example.book.dto.PostsSaveRequestData;
 import com.example.book.service.PostService;
 import javafx.geometry.Pos;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,12 +25,17 @@ public class PostController {
 
     @GetMapping("/{id}")
     public Posts detail(@PathVariable long id){
-        System.out.println(postService);
         return postService.getPost(id);
     }
 
     @PostMapping
     public Posts create(@RequestBody PostsSaveRequestData requestData){
         return postService.save(requestData);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public void delete(@PathVariable Long id) {
+        postService.delete(id);
     }
 }

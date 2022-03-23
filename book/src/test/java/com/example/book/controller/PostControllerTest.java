@@ -6,6 +6,7 @@ import com.example.book.dto.PostsSaveRequestData;
 import com.example.book.dto.SessionResponseData;
 import com.example.book.dto.UserLoginData;
 import com.example.book.dto.UserSaveRequestData;
+import com.example.book.errors.PostsNotFoundException;
 import com.example.book.repository.UserRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,11 +32,11 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @ExtendWith(SpringExtension.class)
@@ -135,6 +136,53 @@ class PostControllerTest {
                 mockMvc.perform(get("/posts"))
                         .andExpect(status().isOk())
                         .andExpect(content().string(containsString(EMPTY_LIST)));
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("게시물 상세 조회 요청은")
+    class Describe_GET{
+        private Posts post;
+
+        @BeforeEach
+        void setUp() throws Exception{
+            post = preparePost(getPostSaveData());
+        }
+
+        @Nested
+        @DisplayName("id에 해당하는 게시물이 있다면")
+        class Context_exist_id_post{
+
+            @DisplayName("게시물 상세와 200 ok HTTP 상태코드를 응답한다.")
+            @Test
+            void it_reponse_post() throws Exception{
+                mockMvc.perform(get("/posts/" + post.getId()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.title", is(post.getTitle())))
+                        .andExpect(jsonPath("$.content", is(post.getContent())))
+                        .andExpect(jsonPath("$.author", is(post.getAuthor())));
+            }
+        }
+
+        @Nested
+        @DisplayName("id에 해당하는 게시물이 없다면")
+        class Context_when_post_is_not_exist {
+
+            @BeforeEach
+            void setUp() throws Exception{
+                deletePostBeforeTest(post.getId());
+            }
+
+            @DisplayName("게시물을 찾을 수 없다는 예외를 던진다.")
+            @Test
+            void it_throw_postNotFoundException() throws Exception {
+                mockMvc.perform(get("/posts/" + post.getId()))
+                        .andExpect(status().isNotFound())
+                        .andExpect(
+                                (result) -> assertTrue(
+                                        result.getResolvedException().getClass().isAssignableFrom(PostsNotFoundException.class)));
+
             }
         }
     }

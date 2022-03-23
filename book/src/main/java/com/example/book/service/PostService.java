@@ -26,4 +26,9 @@ public class PostService {
     public Posts save(PostsSaveRequestData saveRequestData) {
         return postRepository.save(saveRequestData.toEntity());
     }
+
+    public void delete(Long id) {
+        Posts posts = getPost(id);
+        postRepository.deleteById(posts.getId());
+    }
 }
