@@ -7,7 +7,7 @@ import lombok.Getter;
 import javax.validation.constraints.NotBlank;
 
 @Getter
-public class PostUpdateRequestDto {
+public class PostUpdateRequestData {
     @NotBlank
     private String title;
 
@@ -15,7 +15,7 @@ public class PostUpdateRequestDto {
     private String content;
 
     @Builder
-    public PostUpdateRequestDto(String title, String content) {
+    public PostUpdateRequestData(String title, String content) {
         this.title = title;
         this.content = content;
     }

@@ -1,24 +1,17 @@
 package com.example.book.service;
 
 import com.example.book.domain.Posts;
-import com.example.book.dto.PostUpdateRequestDto;
+import com.example.book.dto.PostUpdateRequestData;
 import com.example.book.dto.PostsSaveRequestData;
 import com.example.book.errors.PostsNotFoundException;
 import com.example.book.repository.PostRepository;
-import lombok.Builder;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @DisplayName("게시물 관리")
@@ -106,11 +99,11 @@ class PostServiceTest {
     @Nested
     @DisplayName("게시물 목록 수정은")
     class Discribe_update{
-        PostUpdateRequestDto postUpdateRequestDto;
+        PostUpdateRequestData postUpdateRequestDto;
 
         @BeforeEach
         public void setUp(){
-            postUpdateRequestDto = PostUpdateRequestDto.builder()
+            postUpdateRequestDto = PostUpdateRequestData.builder()
                     .title(NEW_TITLE)
                     .content(NEW_CONTENT)
                     .build();

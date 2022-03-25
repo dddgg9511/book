@@ -1,7 +1,7 @@
 package com.example.book.service;
 
 import com.example.book.domain.Posts;
-import com.example.book.dto.PostUpdateRequestDto;
+import com.example.book.dto.PostUpdateRequestData;
 import com.example.book.dto.PostsSaveRequestData;
 import com.example.book.errors.PostsNotFoundException;
 import com.example.book.repository.PostRepository;
@@ -33,7 +33,7 @@ public class PostService {
         postRepository.deleteById(posts.getId());
     }
 
-    public Posts update(long id, PostUpdateRequestDto updateDto) {
+    public Posts update(long id, PostUpdateRequestData updateDto) {
         Posts post = getPost(id);
 
         post.update(updateDto);

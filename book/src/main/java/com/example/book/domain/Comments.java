@@ -16,9 +16,8 @@ public class Comments extends BaseEntity{
     @Column(name = "comment_id")
     private Long id;
 
-    @ManyToOne
     @JoinColumn(name = "post_id")
-    private Posts posts;
+    private Long postId;
 
     @Column(name = "comment_content")
     private String content;
@@ -26,9 +25,9 @@ public class Comments extends BaseEntity{
     private String email;
 
     @Builder
-    public Comments(Long id, Posts posts, String content, String email) {
+    public Comments(Long id, Long postId, String content, String email) {
         this.id = id;
-        this.posts = posts;
+        this.postId = postId;
         this.content = content;
         this.email = email;
     }

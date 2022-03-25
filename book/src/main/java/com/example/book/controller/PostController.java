@@ -1,19 +1,15 @@
 package com.example.book.controller;
 
 import com.example.book.domain.Posts;
-import com.example.book.dto.PostUpdateRequestDto;
+import com.example.book.dto.PostUpdateRequestData;
 import com.example.book.dto.PostsSaveRequestData;
 import com.example.book.errors.InvalidParameterException;
 import com.example.book.service.PostService;
-import javafx.geometry.Pos;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.PostUpdate;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -42,7 +38,7 @@ public class PostController {
     }
 
     @PatchMapping("/{id}")
-    public Posts update(@PathVariable long id, @RequestBody @Valid PostUpdateRequestDto updateDto,
+    public Posts update(@PathVariable long id, @RequestBody @Valid PostUpdateRequestData updateDto,
                         BindingResult result){
         if(result.hasErrors()){
             throw new InvalidParameterException(result);

@@ -182,6 +182,7 @@ class PostControllerTest {
             @Test
             void it_throw_postNotFoundException() throws Exception {
                 mockMvc.perform(get("/posts/" + post.getId()))
+                        .andDo(print())
                         .andExpect(status().isNotFound())
                         .andExpect(
                                 (result) -> assertTrue(
@@ -245,11 +246,11 @@ class PostControllerTest {
     @Nested
     @DisplayName("게시물 수정 요청은")
     class Describe_patch{
-        PostUpdateRequestDto updateData;
+        PostUpdateRequestData updateData;
 
         @BeforeEach
         public void setUp(){
-            updateData = PostUpdateRequestDto.builder()
+            updateData = PostUpdateRequestData.builder()
                     .title(NEW_TITLE)
                     .content(NEW_CONTENT).build();
         }
@@ -286,7 +287,7 @@ class PostControllerTest {
             @Test
             @DisplayName("게시물을 찾을 수 없다는 예외를 던진다.")
             public void it_return() throws Exception{
-                mockMvc.perform(patch("/post/" + 1)
+                mockMvc.perform(patch("/posts/" + 1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateData)))
                         .andDo(print())
