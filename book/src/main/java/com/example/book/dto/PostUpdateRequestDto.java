@@ -14,12 +14,6 @@ public class PostUpdateRequestDto {
     @NotBlank
     private String content;
 
-    @NotBlank
-    private String author;
-
-    @NotBlank
-    private String email;
-
     @Builder
     public PostUpdateRequestDto(String title, String content) {
         this.title = title;

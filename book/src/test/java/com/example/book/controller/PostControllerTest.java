@@ -2,12 +2,10 @@ package com.example.book.controller;
 
 import com.example.book.domain.Posts;
 import com.example.book.domain.User;
-import com.example.book.dto.PostsSaveRequestData;
-import com.example.book.dto.SessionResponseData;
-import com.example.book.dto.UserLoginData;
-import com.example.book.dto.UserSaveRequestData;
+import com.example.book.dto.*;
 import com.example.book.errors.InvalidParameterException;
 import com.example.book.errors.PostsNotFoundException;
+import com.example.book.repository.PostRepository;
 import com.example.book.repository.UserRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,6 +30,7 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -58,6 +57,9 @@ class PostControllerTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PostRepository postRepository;
 
     @Autowired
     private WebApplicationContext wac;
@@ -172,8 +174,8 @@ class PostControllerTest {
         class Context_when_post_is_not_exist {
 
             @BeforeEach
-            void setUp() throws Exception{
-                deletePostBeforeTest(post.getId());
+            public void setUp(){
+                postRepository.deleteAll();
             }
 
             @DisplayName("게시물을 찾을 수 없다는 예외를 던진다.")
@@ -236,6 +238,63 @@ class PostControllerTest {
                                         InvalidParameterException.class.getCanonicalName(),
                                         result.getResolvedException().getClass().getCanonicalName()
                                 ));
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("게시물 수정 요청은")
+    class Describe_patch{
+        PostUpdateRequestDto updateData;
+
+        @BeforeEach
+        public void setUp(){
+            updateData = PostUpdateRequestDto.builder()
+                    .title(NEW_TITLE)
+                    .content(NEW_CONTENT).build();
+        }
+        @Nested
+        @DisplayName("게시물이 존재한다면")
+        class Context_exist_posts{
+            Posts post;
+
+            @BeforeEach
+            public void setUp() throws Exception {
+                post = preparePost(getPostSaveData());
+            }
+
+            @Test
+            @DisplayName("게시물을 수정하고 수정된 게시물을 반환한다,")
+            public void it_return_posts() throws Exception{
+                mockMvc.perform(patch("/posts/" + post.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateData)))
+                        .andDo(print())
+                        .andExpect(jsonPath("$.title", is(updateData.getTitle())))
+                        .andExpect(jsonPath("$.content", is(updateData.getContent())));
+            }
+        }
+
+        @Nested
+        @DisplayName("게시물이 존재하지 않는 다면")
+        class Context_none_posts{
+            @BeforeEach
+            public void setUp(){
+                postRepository.deleteAll();
+            }
+
+            @Test
+            @DisplayName("게시물을 찾을 수 없다는 예외를 던진다.")
+            public void it_return() throws Exception{
+                mockMvc.perform(patch("/post/" + 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateData)))
+                        .andDo(print())
+                        .andExpect(status().isNotFound())
+                        .andExpect((result ->
+                                assertThat(result.getResolvedException().getClass().getCanonicalName())
+                                        .isEqualTo(PostsNotFoundException.class.getCanonicalName())));
+
             }
         }
     }
