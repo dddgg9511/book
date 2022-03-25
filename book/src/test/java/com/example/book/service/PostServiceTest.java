@@ -108,6 +108,7 @@ class PostServiceTest {
     class Discribe_update{
         PostUpdateRequestDto postUpdateRequestDto;
 
+        @BeforeEach
         public void setUp(){
             postUpdateRequestDto = PostUpdateRequestDto.builder()
                     .title(NEW_TITLE)
