@@ -1,7 +1,9 @@
 package com.example.book.service;
 
 import com.example.book.domain.Posts;
+import com.example.book.dto.PostUpdateRequestDto;
 import com.example.book.dto.PostsSaveRequestData;
+import com.example.book.errors.PostsNotFoundException;
 import com.example.book.repository.PostRepository;
 import lombok.Builder;
 import org.junit.jupiter.api.*;
@@ -14,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -99,6 +102,52 @@ class PostServiceTest {
             }
         }
     }
+
+    @Nested
+    @DisplayName("게시물 목록 수정은")
+    class Discribe_update{
+        PostUpdateRequestDto postUpdateRequestDto;
+
+        public void setUp(){
+            postUpdateRequestDto = PostUpdateRequestDto.builder()
+                    .title(NEW_TITLE)
+                    .content(NEW_CONTENT)
+                    .build();
+        }
+
+        @Nested
+        @DisplayName("게시물이 존재한다면")
+        class Context_exist_posts{
+            Posts post;
+
+            @BeforeEach
+            public void setUp(){
+                post = postService.save(createPost(""));
+            }
+
+            @DisplayName("게시물을 수정하고 수정된 게시물을 반환한다.")
+            @Test
+            public void it_return_posts(){
+                Posts updatePost = postService.update(post.getId(), postUpdateRequestDto);
+
+                assertThat(updatePost.getTitle()).isEqualTo(NEW_TITLE);
+                assertThat(updatePost.getContent()).isEqualTo(NEW_CONTENT);
+            }
+        }
+        
+        @Nested
+        @DisplayName("게시물이 존재하지 않는다면")
+        class Context_none_posts{
+            @Test
+            @DisplayName("게시물을 찾을수 없다는 에러를 던진다.")
+            public void it_throw_postsNoFoundException() throws Exception{
+                assertThatThrownBy(() -> postService.update(1, postUpdateRequestDto))
+                        .isInstanceOf(PostsNotFoundException.class);
+            }
+        }
+    }
+
+
 
 
 

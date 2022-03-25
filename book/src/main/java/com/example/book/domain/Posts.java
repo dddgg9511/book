@@ -1,5 +1,6 @@
 package com.example.book.domain;
 
+import com.example.book.dto.PostUpdateRequestDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,5 +33,10 @@ public class Posts extends BaseEntity{
         this.content = content;
         this.author = author;
         this.email = email;
+    }
+
+    public void update(PostUpdateRequestDto updateDto) {
+        this.title = updateDto.getTitle();
+        this.content = updateDto.getContent();
     }
 }
