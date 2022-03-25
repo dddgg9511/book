@@ -50,7 +50,7 @@ class CommentServiceTest {
 
     @BeforeEach
     public void setPost(){
-        postService.save(getPost());
+        posts = postService.save(getPost());
     }
 
     @AfterEach
