@@ -1,13 +1,12 @@
 package com.example.book.controller;
 
+import com.example.book.domain.Comments;
 import com.example.book.domain.Posts;
 import com.example.book.dto.CommentsSaveData;
 import com.example.book.dto.PostsSaveRequestData;
-import com.example.book.errors.InvalidParameterException;
 import com.example.book.errors.PostsNotFoundException;
 import com.example.book.service.PostService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -19,15 +18,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.filter.CharacterEncodingFilter;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -105,6 +105,35 @@ class CommentControllerTest {
             }
         }
     }
+
+    @Nested
+    @DisplayName("댓글 목록 조회")
+    class Describe_comment_list {
+        @Nested
+        @DisplayName("게시물에 댓글이 존재하면")
+        class Context_when_exist_comments {
+            private static final int count = 10;
+
+            @BeforeEach
+            public void setUp() throws Exception {
+                for(int i = 0; i < count; i++){
+                    mockMvc.perform(post("/comments")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(getComment(posts.getId()))));
+                }
+            }
+
+            @Test
+            @DisplayName("댓글 목록을 리턴한다.")
+            void return_comment_list() throws Exception {
+                mockMvc.perform(get("/comments/" + posts.getId()))
+                                .andExpect(status().isOk());
+
+            }
+        }
+    }
+
+
 
     private CommentsSaveData getComment(Long id) {
         return CommentsSaveData.builder()

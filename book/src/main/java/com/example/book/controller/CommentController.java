@@ -10,6 +10,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,5 +25,10 @@ public class CommentController {
             throw new InvalidParameterException(result);
         }
         return commentService.save(commentsSaveData);
+    }
+
+    @GetMapping("/{postId}")
+    public List<Comments> list(@PathVariable Long postId) {
+        return commentService.commentList(postId);
     }
 }

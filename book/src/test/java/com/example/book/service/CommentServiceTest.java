@@ -11,11 +11,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultActions;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -94,6 +93,55 @@ class CommentServiceTest {
             @DisplayName("찾을 수 없는 게시물이라는 예외를 던진다.")
             void it_throw_PostsNotFoundException() {
                 assertThatThrownBy(() -> commentService.save(commentsSaveData))
+                        .isInstanceOf(PostsNotFoundException.class);
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("댓글 목록 조회")
+    class Describe_comment_list {
+        @Nested
+        @DisplayName("게시물에 댓글이 존재하면")
+        class Context_when_exist_comments {
+            private static final int count = 10;
+
+            @BeforeEach
+            public void setUp(){
+                for(int i = 0; i < count; i++){
+                    commentService.save(getComment(posts.getId()));
+                }
+            }
+
+            @Test
+            @DisplayName("댓글 목록을 리턴한다.")
+            void return_comment_list() {
+                List<Comments> commentList = commentService.commentList(posts.getId());
+
+                assertThat(commentList.size()).isEqualTo(count);
+            }
+        }
+
+        @Nested
+        @DisplayName("게시물에 댓글이 없다면")
+        class Context_when_not_exist_comments {
+
+            @Test
+            @DisplayName("빈 리스트를 리턴한다.")
+            void return_comment_list() {
+                List<Comments> commentList = commentService.commentList(posts.getId());
+
+                assertTrue(commentList.isEmpty());
+            }
+        }
+
+        @Nested
+        @DisplayName("게시물이 존재 하지 않는 다면")
+        class Context_when_nont_post{
+            @Test
+            @DisplayName("찾을 수 없는 게시물이라는 예외를 던진다.")
+            void it_throw_PostsNotFoundException() {
+                assertThatThrownBy(() -> commentService.commentList(-1L))
                         .isInstanceOf(PostsNotFoundException.class);
             }
         }

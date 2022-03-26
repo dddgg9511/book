@@ -6,6 +6,8 @@ import com.example.book.repository.CommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @Service
 public class CommentService {
@@ -18,5 +20,11 @@ public class CommentService {
         postService.getPost(commentsSaveData.getPostId());
 
         return commentRepository.save(commentsSaveData.toEntity());
+    }
+
+    public List<Comments> commentList(Long postId) {
+        postService.getPost(postId);
+
+        return commentRepository.findByPostId(postId);
     }
 }
