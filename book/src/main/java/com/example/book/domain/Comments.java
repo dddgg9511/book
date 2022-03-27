@@ -4,6 +4,7 @@ import javafx.geometry.Pos;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
@@ -19,6 +20,7 @@ public class Comments extends BaseEntity{
     @JoinColumn(name = "post_id")
     private Long postId;
 
+    @Setter
     @Column(name = "comment_content")
     private String content;
 
