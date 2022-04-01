@@ -4,6 +4,7 @@ import com.example.book.domain.Comments;
 import com.example.book.domain.Posts;
 import com.example.book.dto.CommentsSaveData;
 import com.example.book.dto.PostsSaveRequestData;
+import com.example.book.errors.CommentNotFoundException;
 import com.example.book.errors.PostsNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
@@ -96,6 +97,23 @@ class CommentServiceTest {
                         .isInstanceOf(PostsNotFoundException.class);
             }
         }
+    }
+    //미스터 추 입술위에 추 달콤하게 추 몸이 떨려
+    @Nested
+    @DisplayName("댓글 수정은")
+    class Describe_update{
+        @Nested
+        @DisplayName("없는 댓글이면")
+        class Context_when_InvaludComments{
+            @Test
+            @DisplayName("없는 게시물이라는 예외를 던진다")
+            public void it_throw_InvalidCommentException(){
+                assertThatThrownBy(() ->commentService.update(-1L, "est"))
+                        .isInstanceOf(CommentNotFoundException.class);
+
+            }
+        }
+
     }
 
     @Nested

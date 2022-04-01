@@ -31,4 +31,9 @@ public class CommentController {
     public List<Comments> list(@PathVariable Long postId) {
         return commentService.commentList(postId);
     }
+
+    @PatchMapping("/{commentId}")
+    public Comments update(@PathVariable Long commendId, @RequestParam String comments){
+        return commentService.update(commendId,comments);
+    }
 }
