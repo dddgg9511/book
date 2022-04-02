@@ -4,8 +4,11 @@ import com.example.book.dto.PostUpdateRequestData;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.internal.util.stereotypes.Lazy;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -27,6 +30,9 @@ public class Posts extends BaseEntity{
     @Column(nullable = false)
     private String email;
 
+    @OneToMany(mappedBy = "post") @Lazy
+    private List<postHistory> histories = new ArrayList<>();
+
     @Builder
     public Posts(String title, String content, String author, String email) {
         this.title = title;
@@ -38,5 +44,13 @@ public class Posts extends BaseEntity{
     public void update(PostUpdateRequestData updateDto) {
         this.title = updateDto.getTitle();
         this.content = updateDto.getContent();
+
+        postHistory history = postHistory.of(updateDto);
+        addUpdateLog(history);
+    }
+
+    private void addUpdateLog(postHistory history){
+        histories.add(history);
+        history.setPost(this);
     }
 }
