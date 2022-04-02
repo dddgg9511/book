@@ -4,8 +4,11 @@ import com.example.book.domain.Comments;
 import com.example.book.domain.Posts;
 import com.example.book.dto.CommentsSaveData;
 import com.example.book.dto.PostsSaveRequestData;
+import com.example.book.errors.CommentNotFoundException;
 import com.example.book.errors.PostsNotFoundException;
+import com.example.book.service.CommentService;
 import com.example.book.service.PostService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,8 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -38,6 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class CommentControllerTest {
     private static final String EMAIL = "test@gmail.com";
     private static final String COMMENT_CONTENT = "댓글 내용";
+    private static final String COMMENT_NEW_CONTENT = "새로운 댓글 내용";
 
     Posts posts;
 
@@ -52,6 +55,9 @@ class CommentControllerTest {
 
     @Autowired
     private PostService postService;
+
+    @Autowired
+    private CommentService commentService;
 
     @BeforeEach
     void setPosts() throws Exception {
@@ -102,6 +108,47 @@ class CommentControllerTest {
                         .andExpect((result ->
                                 assertThat(result.getResolvedException().getClass().getCanonicalName())
                                         .isEqualTo(PostsNotFoundException.class.getCanonicalName())));
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("댓글 수정은")
+    class Decribe_update_comments{
+        @Nested
+        @DisplayName("존재하는 댓글이면")
+        class Context_with_exist_comments{
+            Comments comments;
+
+            @BeforeEach
+            public void setUp() throws Exception {
+                comments = commentService.save(getComment(posts.getId()));
+            }
+            @Test
+            @DisplayName("댓글을 수정하고 수정된 댓글을 반환한다,")
+            public void it_return_comments() throws Exception{
+                mockMvc.perform(patch("/comments/" + comments.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("comments", COMMENT_NEW_CONTENT))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.content", is(COMMENT_NEW_CONTENT)));
+            }
+        }
+
+        @Nested
+        @DisplayName("찾을수 없는 댓글이라는 예외를 반환한다.")
+        class Context_with_invalid_comments{
+            @Test
+            @DisplayName("존재하지 않는 댓글이면 404 에러코드를 반환한다.")
+            public void it_return_commentNotFoundException() throws Exception{
+                mockMvc.perform(patch("/comments/" + 1)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .param("comments", COMMENT_NEW_CONTENT))
+                        .andExpect(status().isNotFound())
+                        .andExpect((result -> {
+                            assertThat(result.getResolvedException().getClass().getCanonicalName())
+                                    .isEqualTo(CommentNotFoundException.class.getCanonicalName());
+                        }));
             }
         }
     }

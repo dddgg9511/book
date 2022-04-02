@@ -33,7 +33,7 @@ public class CommentController {
     }
 
     @PatchMapping("/{commentId}")
-    public Comments update(@PathVariable Long commendId, @RequestParam String comments){
-        return commentService.update(commendId,comments);
+    public Comments update(@PathVariable Long commentId, @RequestParam String comments){
+        return commentService.update(commentId,comments);
     }
 }

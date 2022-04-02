@@ -1,6 +1,7 @@
 package com.example.book.exception;
 
 import com.example.book.dto.ErrorResponse;
+import com.example.book.errors.CommentNotFoundException;
 import com.example.book.errors.InvalidParameterException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -15,5 +16,11 @@ public class CommonControllerErrorAdvice {
     @ExceptionHandler(InvalidParameterException.class)
     public ErrorResponse handleInvalidParamterException(InvalidParameterException e){
         return ErrorResponse.create().message(e.getMessage()).errors(e.getErrors());
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(CommentNotFoundException.class)
+    public ErrorResponse handleNotFoundException(CommentNotFoundException e){
+        return ErrorResponse.create().message(e.getMessage());
     }
 }
