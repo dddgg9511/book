@@ -6,6 +6,7 @@ import com.example.book.repository.PostUpdateLogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -14,10 +15,10 @@ public class PostUpdateLogService {
     private final PostUpdateLogRepository postUpdateLogRepository;
 
     public PostUpdateLog save(Long id, PostUpdateRequestData updateData){
-        return null;
+        return new PostUpdateLog();
     }
 
     public List<PostUpdateLog> getPostUpdateLogs(Long postId){
-        return null;
+        return new ArrayList<>();
     }
 }
