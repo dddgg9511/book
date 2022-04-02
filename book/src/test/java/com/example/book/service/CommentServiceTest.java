@@ -7,11 +7,13 @@ import com.example.book.dto.PostsSaveRequestData;
 import com.example.book.errors.CommentNotFoundException;
 import com.example.book.errors.PostsNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -33,6 +35,7 @@ class CommentServiceTest {
     private static final String EMAIL = "test@gmail.com";
     private static final String POST_CONTENT = "게시글 내용";
     private static final String COMMENT_CONTENT = "댓글 내용";
+    private static final String COMMENT_NEW_TEXT = "새로운 댓글 내용";
 
     @Autowired
     private CommentService commentService;
@@ -111,6 +114,25 @@ class CommentServiceTest {
                 assertThatThrownBy(() ->commentService.update(-1L, "est"))
                         .isInstanceOf(CommentNotFoundException.class);
 
+            }
+        }
+
+        @Nested
+        @DisplayName("댓글이 존재하면")
+        class Context_when_exist_comments{
+            Comments comments;
+
+            @BeforeEach
+            public void setUp(){
+               comments = commentService.save(getComment(posts.getId()));
+            }
+
+            @Test
+            @DisplayName("댓글을 수정하고 수정된 댓글을 반환한다.")
+            public void it_return_comments(){
+                Comments updateComments = commentService.update(comments.getId(), COMMENT_NEW_TEXT);
+
+                assertThat(updateComments.getContent()).isEqualTo(COMMENT_NEW_TEXT);
             }
         }
 
